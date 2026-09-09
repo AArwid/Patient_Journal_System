@@ -1,112 +1,113 @@
 # Gruppkontrakt
 
-## Introduktion
-Här är en mall för gruppkontraktet.
-
-Ni väljer själva om ni vill jobba enligt agila metoder, men det är starkt rekommenderat att fortsätta öva på dessa kunskaper. Det ger också struktur till arbetet med backlog refining, planning poker, sprint planning och retrospektiv.
-
-Det är fritt att lägga till/ta bort, men det finns en extremt tydlig koppling mellan välskrivna gruppkontrakt och väl utförda arbeten/portfolio cases.
 
 ## Kontraktets innehåll
 
 ### Tidigare grupparbeteserfarenheter
 - Vilka är respektive gruppmedlems top 3 sämsta erfarenheter med grupparbeten? Vilka "negativa förväntningar" kommer ni in i detta med?
+Ellinor: Folk har inte svarat på en vecka.
 
-> Exempel: Personer gör inte det dom har lovat inom utsatt tid, och säger att "dom jobbar på det", men det blir aldrig klart.
+Arwid: Folk dyker inte upp/ inte delaktiga
 
-> [!TIP]
-> Det är bra att få ur sig de negativa förväntningarna och att diskutera öppet kring tidigare erfarenheter. Ju öppnare ni är i er kommunikation nu, desto bättre grupparbete kommer ni att få. På en arbetsplats kanske man känner varandra redan och det finns andra "krav". Av någon anledning beter sig många annorlunda i en skolmiljö när det gäller grupparbeten :thinking:
+Fredrik: Få ihop tider.
+
+Ahmed:
 
 ### Mötestider
 Vilka dagar och tider jobbar vi gemensamt?
 
-Ni ska planera in:
+Ni ska planera in: 
+Vi arbetar dagtid/ efter kl.13 har vi möten.
+Minst 2 dagar i veckan möten. 
+Tisdagar och fredagar har vi avstämmning.
 
 - Daily standup _varje vardag_. Det får gärna vara samma tid så att det är lätt att komma ihåg, men det är upp till gruppen att bestämma. Ni **ska** fylla i en loggbok dagligen med er daily.
-- Tid för backlog refining varje vecka (cirka 1 h).
-- Tid för sprint planning varje vecka (cirka 1-2 h).
-- Tid för retrospektiv varje vecka (cirka 1 h).
+- Minst 2 dagar i veckan möten. 
+- Tisdagar och fredagar har vi avstämmning.
+- Övriga möten vid behov.
 
 ### Möteskanaler & format
-- Hur träffas vi? Discord, Teams, på någon fysisk plats…
-- Kamera av/på? (Det är en _stark_ rekommendation att ha kamera på, det blir mycket lättare att kommunicera. Man behöver inte se ut som en Kardashian…)
-- Ska man komma förberedd eller går vi gemensamt igenom vad som ska göras på mötet?
-- Definiera vad som är "brådskande", och hur man kommunicerar om något är brådskande. SMS? Telefonsamtal?
+- Hur träffas vi? Discord. 
+- Kamera av/på det man känner för.
+- Ska man komma förberedd eller går vi gemensamt igenom vad som ska göras på mötet? 
+Svar: Man kan vara förberedd eller inte om inget annat har sagts.
+- Definiera vad som är "brådskande", och hur man kommunicerar om något är brådskande. 
+Svar: SMS och Telefonsamtal.
 - Befinner vi oss alla i samma tidszon?
+Svar: JA
 
 ### Kommunikation
-- Via vilka kanaler kommunicerar vi?
+- Via vilka kanaler kommunicerar vi? 
+Svar: Discord 
 - Vilka tider kommunicerar vi?
+Svar: Dagtid, vid behov.
 - Inom vilken tidsfrist kan man förvänta sig svar/återkoppling?
+Svar: 1-2 dagar.
 - Hur meddelar man förhinder? I hur god tid meddelar man förhinder?
+Svar: Så fort man får reda på det. 
 - Överväg att dela er mail/telefonnummer så att ni faktiskt kan nå varandra.
+Svar: Ja
 - Hur föredrar vi att jobba? Live-koda tillsammans? På egen hand?
+Svar: Båda två.
 - Ska vi göra kod-merges ihop? När är det OK att göra en merge?
+Svar: JA det gör vi tillsammans. 
 - Hur hanterar vi kodkonflikter?
+Svar: Vi löser dom tillsammans.
 - Vem ansvarar för att dokumentera daily standup i repot? (Rotera gärna denna roll med någon frekvens så att inte en person gör det enbart).
+Svar: Arwid, Ellinor och Fredrik
 
 ### Feedback & återkoppling
 - Hur gör vi code reviews?
+Svar: Tillsammans.
 - Hur ger vi feedback på designarbete?
+Svar: Rakt och ärligt.
 - Inom vilken tidsfrist ska återkoppling ges?
+Svar: 1 Dag, exkludera helger.
 - Hur känns det när man inte får någon återkoppling på det man har gjort?
-
-### Personlighetstyp
-> Det kan kännas obekvämt att diskutera följande, men det är en grund för ett bra samarbete att dels ha lite självinsikt, men också förståelse för hur ens gruppmedlemmar fungerar i olika situationer.
-
-Hurdant reagerar varje gruppmedlem vid stress?
-- Flyr situationen, slutar delta, ignorerar situationen/grupparbetet
-- Blir konfrontativ/aggressiv
-- Fryser till, vet inte vad man ska göra, svårt att komma igång och/eller vidare
-- Försöker få alla att må bra/komma överens
-- På något annat sätt?
-
-Vilken roll brukar varje gruppmedlem ta på sig i ett grupparbete? Vilken roll har du "i det tysta" för dig själv?
-- **Ledaren:** Drivande, dynamisk, tar initiativ.
-- **Planeraren/Genomföraren:** Organiserad, praktisk, pålitlig
-- **Experten/Specialisten:** Djup kunskap, fokuserad, analytisk
-- **Informationssökaren:** Nyfiken, faktabaserad, samlar data
-- **Slutföraren/Kvalitetssäkraren:** Noggrann, detaljfokuserad, avslutar i tid.
-- **Innovatören/Idésprutan:** Kreativ, fantasifull, ser nya lösningar.
-- **Granskaren/Utvärderaren:** Kritisk, strategisk, objektiv, logisk.
-- **Djävulens advokat:** Utmanande, ifrågasätter konstruktivt.
-- **Lagspelaren/Samordnaren:** Samarbetsvillig, diplomatisk, stöttande.
-- **Pepparen:** Positiv, empatisk, skapar god stämning.
-- **Dörrvakten/Processledaren:** Säkerställer deltagande, hanterar diskussionen.
+Svar: Inte kul
 
 ### Uppgiftsfördelning
 - Hur fördelas uppgifter?
+Svar: Välja sina egna men hålla sig inom sina egna/valda uppgifter.
+Fredrik: Express API
+Ellinor: FrontEnd
+Arwid: Cryptoliggare
+Ahmed: PTP-nätverk
+
 - Hur kommunicerar man när man tar på sig en uppgift utanför daily standupen, eller ska man vänta till standupen?
+Svar: Vi kommuniserar vid discord.
 - Vad är definitionen på "klar"?
+Svar: När alla anser att det är klart.
 - Hur granskar vi varandras kod?
+Svar: Alla ser till att commita sin kod som man kan granska koden.
 
 ### Övriga förväntningar
 - Vilken ambitionsnivå har vi?
+Svar: Bygga en stabil och lättanvänd produkt.
 - Hur mycket förväntas man delta/hur aktivt ska man vara?
+Svar: Man gör sina uppgifter och hjälper till om man kan.
 - Vad blir konsekvenserna om man inte är aktiv i projektet? Hur många kontaktförsök gör man? Hur snabbt ska personen återkomma som inte varit aktiv/gått att nå? Hur fort tar man kontakt med läraren om någon inte dyker upp/gör det man kommit överens om?
-- Vad är du bra på?
-- Vad är du sämre på?
-- Finns det något du rent tekniskt vill träna extra på? HTMl, CSS, git? Projektledning?
+Svar: Man ser till att man får sina delar gjoda och bidrar till det man kan.
 
-### Scrum master
-Utse gärna en scrum master som ansvarar för att _delegera_ uppgifter. Scrum mastern ska inte _göra allt_, utan se till att alla har att göra och att ingen sitter fast.
-
-Vill ni rotera rollen, så gör det, men det går också bra om en person är bekväm med att ta på sig rollen.
-
-Om ingen vill vara scrum master så bör ni komma överens om vem som styr skutan på annat sätt.
-
-### Övrigt
-Om ni vill ta upp någonting utöver det fördefinierade. Skriv gärna en egen rubrik.
 
 ### Kodstandard
 - Hur skriver vi våra commit-meddelanden? Ska vi följa någon särskild standard (t.ex. Conventional Commits eller använda gitmoji).
-- Hur indenterar vi vår kod?
+Svar:  Conventional Commits
 - Vilket språk använder vi i vår kod, för t.ex. CSS-selektorer?
+JavaScript, React, Css.
 - Hur kommenterar vi vår kod?
+Svar: Valfritt, eller vid behov.
 - Ska vi använda några linters (ESLint, Prettier, Biome…?) och vilka konfigurationer ska vi göra för dessa?
+Svar: Prittier
+
 
 ### Underskrifter
 Slutligen ska ni signera dokumentet med era underskrifter.
+
+Ellinor Forselius
+Arwid Anesten
+Fredrik Hammarstedt
+
 
 
 ## Att jobba i grupp
