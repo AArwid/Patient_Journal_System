@@ -1,0 +1,14 @@
+# 9/9 Onsdag kl. 13.00-14.50:
+Närvarande: Ellinor, Arwind och Fredrik.
+Dagens Daily Standup: Arwid löste repot som han tilldelade resterande i gruppen  samt ett projekt för att kunna lägga upp issues. Ett issues skapades vilket var gruppkontrakt. 
+Vi skrev gruppkontrakt och diskuterade projektets upplägg och indelning av uppgifter. Med detta tog vi upp förhållningsregler som tider, mötes kanaler, kommunikation, feedback och återkoppling, förväntningar och kodstandarder. Ahmed jobbar så han fyller i gruppkontraktet senare idag.
+
+Uppgiftsfördelningen blev följande:
+Fredrik: Express API
+Ellinor: FrontEnd
+Arwid: Crypto Liggaren
+Ahmed: PTP-nätverk 
+
+# Nästa daily standup fredag 11/9, kl.13.00. 
+Dagens Daily Standup: Idag beslöt vi oss att alla jobbar på egen hand och börjar lägga in issues i board. Så vi bryter ner Express API, FrontEnd, Crypto liggaren och PTP-Nätverket i mindre delar. Vi kommer nästa tisdag den 15/9 att gå igenom dem tillsammans.
+
