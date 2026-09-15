@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
 const config = require('./config');
+const authRoutes = require('./routes/auth.routes');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -32,8 +33,9 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', serverId: config.serverId });
 });
 
-// Feature routes are mounted incrementally in later commits/PRs:
-//   app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes);
+
+// Patient/notes routes are mounted in a follow-up PR:
 //   app.use('/api/patients', patientsRoutes);
 
 app.use((req, res) => {
