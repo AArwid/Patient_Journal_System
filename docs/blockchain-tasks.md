@@ -8,8 +8,8 @@ Use this checklist for the blockchain and immutable audit-log work. Each task sh
 - [ ] Implement deterministic serialization so the same block data always produces the same hash.
 - [x] Implement SHA-256 hash calculation for every block.
 - [x] Implement the genesis block with a fixed, documented starting value.
-- [ ] Implement append-only block creation and chain access.
-- [ ] Implement chain validation for broken links, changed data, invalid hashes, malformed blocks, and invalid ordering.
+- [x] Implement append-only block creation and chain access.
+- [x] Implement chain validation for broken links, changed data, invalid hashes, malformed blocks, and invalid ordering.
 - [ ] Keep blockchain code independent from the SQL journal model.
 - [ ] Do not provide an API operation that edits or deletes an audit block.
 
@@ -22,12 +22,16 @@ Use this checklist for the blockchain and immutable audit-log work. Each task sh
 
 ## 2. Public/private key signing
 
-- [ ] Generate or load a signing key pair for the audit-log authority.
-- [ ] Store private keys outside the repository and outside database records.
-- [ ] Keep the public key available to verification code and peer servers.
+- [x] Generate or load a signing key pair for the audit-log authority.
+- [x] Store private keys outside the repository and outside database records.
+- [x] Keep the public key available to verification code and peer servers.
 - [ ] Sign the canonical block payload before storing or broadcasting the block.
-- [ ] Reject empty, malformed, or unsupported signatures.
-- [ ] Add key-loading error handling without exposing key material in logs or responses.
+- [x] Sign the canonical block payload before storing or broadcasting the block.
+- [x] Reject empty, malformed, or unsupported signatures.
+- [x] Add key-loading error handling without exposing key material in logs or responses.
+
+Configure key files with `BLOCKCHAIN_PRIVATE_KEY_PATH` and
+`BLOCKCHAIN_PUBLIC_KEY_PATH`.
 
 ### Acceptance criteria
 
