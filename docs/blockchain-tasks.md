@@ -6,8 +6,8 @@ Use this checklist for the blockchain and immutable audit-log work. Each task sh
 
 - [ ] Define the block data model with `index`, `timestamp`, `previousHash`, `event`, `signature`, and `hash`.
 - [ ] Implement deterministic serialization so the same block data always produces the same hash.
-- [ ] Implement SHA-256 hash calculation for every block.
-- [ ] Implement the genesis block with a fixed, documented starting value.
+- [x] Implement SHA-256 hash calculation for every block.
+- [x] Implement the genesis block with a fixed, documented starting value.
 - [ ] Implement append-only block creation and chain access.
 - [ ] Implement chain validation for broken links, changed data, invalid hashes, malformed blocks, and invalid ordering.
 - [ ] Keep blockchain code independent from the SQL journal model.
