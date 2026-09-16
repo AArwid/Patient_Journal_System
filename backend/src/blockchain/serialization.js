@@ -1,9 +1,4 @@
-const BLOCK_PAYLOAD_FIELDS = [
-  "index",
-  "timestamp",
-  "previousHash",
-  "event",
-];
+const BLOCK_PAYLOAD_FIELDS = ["index", "timestamp", "previousHash", "event"];
 
 function serializeBlockPayload(block) {
   if (block === null || typeof block !== "object") {
@@ -23,7 +18,11 @@ function serializeBlockPayload(block) {
 }
 
 function normalizeValue(value, ancestors) {
-  if (value === null || typeof value === "string" || typeof value === "boolean") {
+  if (
+    value === null ||
+    typeof value === "string" ||
+    typeof value === "boolean"
+  ) {
     return value;
   }
 
