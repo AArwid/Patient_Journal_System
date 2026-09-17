@@ -5,6 +5,7 @@ import test from "node:test";
 import {
   signBlockPayload,
   validateSignature,
+  verifyBlockSignature,
 } from "../src/blockchain/signing.js";
 
 const blockPayload = {
@@ -39,4 +40,32 @@ test("changes the signature when signed payload data changes", () => {
 test("rejects empty and malformed signatures", () => {
   assert.throws(() => validateSignature(""), /non-empty/);
   assert.throws(() => validateSignature("not-a-signature"), /base64/);
+});
+
+test("verifies a signature with the matching public key", () => {
+  const { privateKey, publicKey } = generateKeyPairSync("ed25519");
+  const signature = signBlockPayload(blockPayload, privateKey);
+
+  assert.equal(
+    verifyBlockSignature({ ...blockPayload, signature }, publicKey),
+    true,
+  );
+});
+
+test("rejects changed payloads and wrong public keys", () => {
+  const firstKeys = generateKeyPairSync("ed25519");
+  const secondKeys = generateKeyPairSync("ed25519");
+  const signature = signBlockPayload(blockPayload, firstKeys.privateKey);
+
+  assert.equal(
+    verifyBlockSignature(
+      { ...blockPayload, event: { type: "changed" }, signature },
+      firstKeys.publicKey,
+    ),
+    false,
+  );
+  assert.equal(
+    verifyBlockSignature({ ...blockPayload, signature }, secondKeys.publicKey),
+    false,
+  );
 });

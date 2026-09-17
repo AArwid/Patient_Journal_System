@@ -2,7 +2,12 @@ import Block from "./block.js";
 import { createGenesisBlock } from "./genesis.js";
 import { calculateBlockHash } from "./hash.js";
 import { serializeBlockPayload } from "./serialization.js";
-import { signBlockPayload, validateSignature } from "./signing.js";
+import {
+  signBlockPayload,
+  validateSignature,
+  verifyBlockSignature,
+} from "./signing.js";
+import { createMerkleRoot } from "./merkle.js";
 
 class Blockchain {
   #blocks;
@@ -37,9 +42,32 @@ class Blockchain {
     });
   }
 
-  appendBlock(block) {
+  createMerkleBatchBlock({
+    leaves,
+    privateKey,
+    signature,
+    timestamp = new Date().toISOString(),
+  }) {
+    if (!Array.isArray(leaves) || leaves.length === 0) {
+      throw new RangeError("Merkle batch must contain at least one leaf");
+    }
+
+    return this.createBlock({
+      privateKey,
+      signature,
+      timestamp,
+      event: {
+        type: "merkle.batch",
+        merkleRoot: createMerkleRoot(leaves),
+        leafCount: leaves.length,
+      },
+    });
+  }
+
+  appendBlock(block, publicKey) {
     const previousBlock = this.#blocks.at(-1);
     const normalizedBlock = block instanceof Block ? block : new Block(block);
+
     validateSignature(normalizedBlock.signature);
     if (
       normalizedBlock.index !== previousBlock.index + 1 ||
@@ -50,7 +78,11 @@ class Blockchain {
       );
     }
 
-    if (!this.validateChain([...this.#blocks, normalizedBlock])) {
+    if (publicKey && !verifyBlockSignature(normalizedBlock, publicKey)) {
+      throw new Error("Block signature verification failed");
+    }
+
+    if (!this.validateChain([...this.#blocks, normalizedBlock], publicKey)) {
       throw new Error("Block failed chain validation");
     }
 
@@ -58,7 +90,7 @@ class Blockchain {
     return normalizedBlock;
   }
 
-  validateChain(chain = this.#blocks) {
+  validateChain(chain = this.#blocks, publicKey) {
     try {
       if (!Array.isArray(chain) || chain.length === 0) {
         return false;
@@ -88,10 +120,59 @@ class Blockchain {
           return false;
         }
 
-        return calculateBlockHash(block) === block.hash;
+        if (calculateBlockHash(block) !== block.hash) {
+          return false;
+        }
+
+        if (index === 0) {
+          return true;
+        }
+
+        if (!publicKey) {
+          return true;
+        }
+
+        return verifyBlockSignature(block, publicKey);
       });
     } catch {
       return false;
+    }
+  }
+
+  verifyBlockIntegrity(block, publicKey) {
+    try {
+      const normalizedBlock = block instanceof Block ? block : new Block(block);
+      const chain = this.#blocks;
+      const blockIndex = chain.findIndex(
+        (storedBlock) => storedBlock.hash === normalizedBlock.hash,
+      );
+      const previousBlock = blockIndex > 0 ? chain[blockIndex - 1] : undefined;
+
+      if (normalizedBlock.index === 0) {
+        return {
+          valid: this.validateChain([normalizedBlock]),
+          reason: "genesis block",
+        };
+      }
+
+      if (calculateBlockHash(normalizedBlock) !== normalizedBlock.hash) {
+        return { valid: false, reason: "hash mismatch" };
+      }
+
+      if (
+        previousBlock &&
+        normalizedBlock.previousHash !== previousBlock.hash
+      ) {
+        return { valid: false, reason: "previous hash mismatch" };
+      }
+
+      if (!verifyBlockSignature(normalizedBlock, publicKey)) {
+        return { valid: false, reason: "signature verification failed" };
+      }
+
+      return { valid: true, reason: "verified" };
+    } catch {
+      return { valid: false, reason: "malformed block" };
     }
   }
 

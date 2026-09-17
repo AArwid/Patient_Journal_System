@@ -41,11 +41,11 @@ Configure key files with `BLOCKCHAIN_PRIVATE_KEY_PATH` and
 
 ## 3. Hash and signature verification
 
-- [ ] Recalculate a block hash from its canonical payload during validation.
-- [ ] Verify that the stored hash matches the recalculated hash.
-- [ ] Verify the block signature against the trusted public key.
-- [ ] Verify `previousHash` against the preceding block.
-- [ ] Return a clear valid/invalid verification result to the audit-log UI.
+- [x] Recalculate a block hash from its canonical payload during validation.
+- [x] Verify that the stored hash matches the recalculated hash.
+- [x] Verify the block signature against the trusted public key.
+- [x] Verify `previousHash` against the preceding block.
+- [x] Return a clear valid/invalid verification result to the audit-log UI.
 - [ ] Record denied access attempts when the application requirements require them to be visible.
 - [ ] Add tests for valid blocks, changed event data, changed timestamps, changed hashes, broken links, and invalid signatures.
 
@@ -57,16 +57,18 @@ Configure key files with `BLOCKCHAIN_PRIVATE_KEY_PATH` and
 
 ## 4. Merkle tree for batched access logs
 
-- [ ] Define the leaf payload using minimal audit metadata only.
-- [ ] Hash each access-log leaf deterministically.
-- [ ] Build parent hashes until one Merkle root remains.
-- [ ] Define and document the behavior for an odd number of leaves.
-- [ ] Store the Merkle root and batch metadata in a blockchain block.
-- [ ] Implement proof generation for an individual access log.
-- [ ] Implement proof verification against the stored Merkle root.
-- [ ] Add tests for empty batches, one leaf, two leaves, odd-sized batches, changed leaves, and invalid proofs.
+- [x] Define the leaf payload using minimal audit metadata only.
+- [x] Hash each access-log leaf deterministically.
+- [x] Build parent hashes until one Merkle root remains.
+- [x] Define and document the behavior for an odd number of leaves.
+- [x] Store the Merkle root and batch metadata in a blockchain block.
+- [x] Implement proof generation for an individual access log.
+- [x] Implement proof verification against the stored Merkle root.
+- [x] Add tests for empty batches, one leaf, two leaves, odd-sized batches, changed leaves, and invalid proofs.
 
 ### Acceptance criteria
+
+Odd-sized batches duplicate the final leaf when building the next Merkle level.
 
 - The same ordered batch always produces the same Merkle root.
 - Changing one access log changes the root and invalidates its proof.

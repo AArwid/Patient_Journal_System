@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { generateKeyPairSync } from "node:crypto";
 import test from "node:test";
 
 import Block from "../src/blockchain/block.js";
@@ -107,4 +108,88 @@ test("rejects an invalid genesis block", () => {
   chain[0].event.type = "not-genesis";
 
   assert.equal(blockchain.validateChain(chain), false);
+});
+
+test("returns a valid integrity result for a signed block", () => {
+  const blockchain = new Blockchain();
+  const { privateKey, publicKey } = generateKeyPairSync("ed25519");
+  const block = blockchain.createBlock({
+    event: { type: "journal.accessed", recordId: "opaque-record-1" },
+    privateKey,
+    timestamp: "2026-09-16T12:00:00.000Z",
+  });
+  blockchain.appendBlock(block);
+
+  assert.deepEqual(blockchain.verifyBlockIntegrity(block, publicKey), {
+    valid: true,
+    reason: "verified",
+  });
+  assert.equal(
+    blockchain.validateChain(blockchain.getChain(), publicKey),
+    true,
+  );
+});
+
+test("reports invalid integrity for a changed signed block", () => {
+  const blockchain = new Blockchain();
+  const { privateKey, publicKey } = generateKeyPairSync("ed25519");
+  const block = blockchain.createBlock({
+    event: { type: "journal.accessed", recordId: "opaque-record-1" },
+    privateKey,
+    timestamp: "2026-09-16T12:00:00.000Z",
+  });
+  const changedBlock = {
+    ...block.toJSON(),
+    event: { type: "journal.accessed", recordId: "changed-record" },
+  };
+
+  assert.deepEqual(blockchain.verifyBlockIntegrity(changedBlock, publicKey), {
+    valid: false,
+    reason: "hash mismatch",
+  });
+});
+
+test("rejects a mismatched signature when appending with a trusted public key", () => {
+  const blockchain = new Blockchain();
+  const { privateKey, publicKey } = generateKeyPairSync("ed25519");
+  const validBlock = blockchain.createBlock({
+    event: { type: "journal.accessed", recordId: "opaque-record-1" },
+    privateKey,
+    timestamp: "2026-09-16T12:00:00.000Z",
+  });
+
+  const tamperedBlock = {
+    ...validBlock.toJSON(),
+    event: { type: "journal.accessed", recordId: "changed-record" },
+    hash: calculateBlockHash({
+      index: validBlock.index,
+      timestamp: validBlock.timestamp,
+      previousHash: validBlock.previousHash,
+      event: { type: "journal.accessed", recordId: "changed-record" },
+    }),
+  };
+
+  assert.throws(
+    () => blockchain.appendBlock(tamperedBlock, publicKey),
+    /signature/i,
+  );
+});
+
+test("stores only Merkle root metadata in a batch block", () => {
+  const blockchain = new Blockchain();
+  const leaves = [
+    { eventType: "journal.accessed", recordId: "opaque-1" },
+    { eventType: "journal.accessed", recordId: "opaque-2" },
+  ];
+  const block = blockchain.createMerkleBatchBlock({
+    leaves,
+    signature:
+      "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+    timestamp: "2026-09-16T12:00:00.000Z",
+  });
+
+  assert.equal(block.event.type, "merkle.batch");
+  assert.equal(block.event.leafCount, 2);
+  assert.match(block.event.merkleRoot, /^[a-f0-9]{64}$/);
+  assert.equal(JSON.stringify(block).includes("opaque-1"), false);
 });

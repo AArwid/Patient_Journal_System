@@ -1,4 +1,4 @@
-import { sign } from "node:crypto";
+import { sign, verify } from "node:crypto";
 
 import { serializeBlockPayload } from "./serialization.js";
 
@@ -32,4 +32,22 @@ function validateSignature(signature) {
   }
 }
 
-export { signBlockPayload, validateSignature };
+function verifyBlockSignature(block, publicKey) {
+  if (!publicKey) {
+    return false;
+  }
+
+  try {
+    validateSignature(block.signature);
+    return verify(
+      null,
+      Buffer.from(serializeBlockPayload(block), "utf8"),
+      publicKey,
+      Buffer.from(block.signature, "base64"),
+    );
+  } catch {
+    return false;
+  }
+}
+
+export { signBlockPayload, validateSignature, verifyBlockSignature };
