@@ -23,3 +23,13 @@ vi snackade om upplägg för ui/ux, samn vad som ska loggas på blockchain och v
 vi diskuterade hur långt vi borde ha kommit tills nästa Daily-standupp-möte!
 
 Deltagare på mötet /Arwid /Ellinor /Fredrik
+
+
+## 2026-09-18 //Fredrik
+
+Vi gick igenom koden som skrivits hittils och blivit pushat till Github. 
+Det såg bra ut och mergades till main.
+
+Vi diskuterade en del frontend och Ellinor kommer pusha upp sin kod relaterat till det innan tisdagens möte.
+
+Deltagare på mötet /Arwid /Ellinor /Fredrik
