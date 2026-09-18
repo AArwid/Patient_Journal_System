@@ -1,5 +1,6 @@
 const express = require('express');
 const patientsRepository = require('../db/patients.repository');
+const notesRepository = require('../db/notes.repository');
 const requireAuth = require('../middleware/requireAuth');
 const requireRole = require('../middleware/requireRole');
 const requirePatientAccess = require('../middleware/requirePatientAccess');
@@ -19,6 +20,27 @@ router.get('/:id', requirePatientAccess, (req, res) => {
   const patient = patientsRepository.findById(Number(req.params.id));
   if (!patient) return res.status(404).json({ error: 'Patient not found' });
   res.json({ patient });
+});
+
+router.get('/:id/notes', requirePatientAccess, (req, res) => {
+  const notes = notesRepository.findVisibleForPatient(Number(req.params.id), req.session.user);
+  res.json({ notes });
+});
+
+router.post('/:id/notes', requirePatientAccess, (req, res) => {
+  const { content, visibility } = req.body;
+  if (!content || !['private', 'staff', 'all'].includes(visibility)) {
+    return res.status(400).json({ error: 'content and a valid visibility are required' });
+  }
+
+  const note = notesRepository.create({
+    patientId: Number(req.params.id),
+    authorUserId: req.session.user.id,
+    content,
+    visibility,
+  });
+
+  res.status(201).json({ note });
 });
 
 module.exports = router;
