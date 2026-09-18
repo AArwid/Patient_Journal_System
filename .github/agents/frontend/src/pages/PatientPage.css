@@ -1,0 +1,147 @@
+.patient-container {
+    font-family: system-ui, -apple-system, sans-serif;
+    background-color: #f8fafc;
+    min-height: 100vh;
+}
+
+.patient-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 16px 32px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.patient-header h1 {
+    margin: 0;
+    font-size: 20px;
+    color: #0f172a;
+}
+
+.user-info {
+    font-size: 14px;
+    color: #64748b;
+}
+
+.logout-btn {
+    display: flex;
+    align-items: center;
+    background-color: #ef2d2d;
+    color: #ffffff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.patient-main {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 24px;
+    padding: 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.content-section,
+.log-section {
+    background-color: #ffffff;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.log-section {
+    height: fit-content;
+}
+
+.verification-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #166534;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.medical-card {
+    background-color: #f8fafc;
+    padding: 20px;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+    margin-top: 16px;
+}
+
+.role-tag {
+    display: inline-block;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 4px;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+}
+
+.tag-doctor { background-color: #2563eb; }
+.tag-nurse { background-color: #ea580c; }
+.tag-clinic { background-color: #0284c7; }
+.tag-patient { background-color: #16a34a; }
+
+.access-card.denied {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 32px;
+    border-radius: 8px;
+    background-color: #fef2f2;
+    border: 1px solid #fca5a5;
+}
+
+.access-card.denied h3 { 
+    color: #991b1b; margin: 12px 0 6px 0; }
+.access-card.denied p { 
+    color: #7f1d1d; margin: 0; }
+
+.log-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.log-header h3 { margin: 0; }
+
+.log-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.log-item {
+    background-color: #f1f5f9;
+    padding: 10px;
+    border-radius: 6px;
+    border-left: 4px solid #2563eb;
+}
+
+.log-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #64748b;
+}
+
+.log-hash { font-family: monospace; }
+.log-body { margin-top: 4px; font-size: 13px; }
+.log-action { color: #2563eb; font-weight: 600; }
