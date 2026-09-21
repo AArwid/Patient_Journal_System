@@ -19,7 +19,7 @@ export const LoginPage = () => {
       
         const correctPassword = ROLE_PASSWORDS[selectedRole];
         if (password !== correctPassword) {
-            setError(`Invalid password for ${selectedRole}. (Hint: try '${correctPassword}')`);
+            setError(`Invalid password for ${selectedRole}. Please check the role access code.`);
             return;
         }
 
