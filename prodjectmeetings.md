@@ -14,7 +14,7 @@ Ahmed: PTP-nätverk
 
 Dagens Daily Standup: Idag beslöt vi oss att alla jobbar på egen hand och börjar lägga in issues i board. Så vi bryter ner Express API, FrontEnd, Crypto liggaren och PTP-Nätverket i mindre delar. Vi kommer nästa tisdag den 15/9 att gå igenom dem tillsammans.
 
-## 2026-09-15 //Arwid
+## 2026-09-15 //Fredrik
 
 vi diskuterade upplägg på uppgiften, om vi skulle ha engelska eller svenska, vi bestämde oss för att använda better-sqlite3 som databas och har fyllt i våra egna sprintar för uppgifter samt tidsramen.
 
@@ -23,3 +23,14 @@ vi snackade om upplägg för ui/ux, samn vad som ska loggas på blockchain och v
 vi diskuterade hur långt vi borde ha kommit tills nästa Daily-standupp-möte!
 
 Deltagare på mötet /Arwid /Ellinor /Fredrik
+
+## 2026-09-22 //Fredrik
+
+Ellinor visar hur långt hon kommit med frontend. Många av delarna är klara.
+
+Fredrik visar att express Api delarna snart är klara. Vi kommer behöva prata ihop oss om hur vi ska knyta an varandras delar.
+
+vi diskuterade hur långt vi borde ha kommit tills nästa Daily-standupp-möte!
+
+Deltagare på mötet /Arwid /Ellinor /Fredrik
+
