@@ -1,6 +1,7 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { ROLES } from '../constants/roles';
+import { PATIENTS_DATABASE } from '../constants/Patients';
 import { useNavigate } from 'react-router-dom';
 import { AlertTriangle, Lock, LogOut, CheckCircle } from 'lucide-react';
 import './PatientPage.css';
@@ -9,15 +10,32 @@ export const PatientPage = () => {
     const { user, logout, auditLogs, logBlockchainAccess } = useAuth();
     const navigate = useNavigate();
 
+    const [searchQuery, setSearchQuery] = useState('19850512-1234');
+    const [selectedPatient, setSelectedPatient] = useState(PATIENTS_DATABASE['19850512-1234']);
+
     useEffect(() => {
         if (!user) {
             navigate('/login');
-        } else {
-            logBlockchainAccess(user, 'READ', `Accessed patient health record with role: ${user.role}`);
+        } else if (selectedPatient) {
+            logBlockchainAccess(user, 'READ', `Accessed patient health record: ${selectedPatient.name} (${selectedPatient.id})`);
         }
-    }, [user, navigate, logBlockchainAccess]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user, navigate]);
 
     if (!user) return null;
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        const query = searchQuery.trim();
+        const found = PATIENTS_DATABASE[query] || Object.values(PATIENTS_DATABASE).find(p => p.name.toLowerCase().includes(query.toLowerCase()));
+        
+        if (found) {
+            setSelectedPatient(found);
+            logBlockchainAccess(user, 'SEARCH', `Searched for patient: ${query} — Found: ${found.name} (${found.id})`);
+        } else {
+            setSelectedPatient(null);
+        }
+    };
 
     const handleLogout = () => {
         logout();
@@ -38,6 +56,19 @@ export const PatientPage = () => {
                     <LogOut size={16} style={{ marginRight: 6 }} /> Log Out
                 </button>
             </header>
+
+            <section className="search-section">
+                <form onSubmit={handleSearch} className="search-form">
+                    <input
+                        type="text"
+                        placeholder="Search by Patient ID or Name"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="search-input"
+                    />
+                    <button type="submit" className="search-btn">🔍 Search</button>
+                </form>
+            </section>
 
             <main className="patient-main">
                 {/* Dynamic Role Access */}

@@ -145,3 +145,69 @@
 .log-hash { font-family: monospace; }
 .log-body { margin-top: 4px; font-size: 13px; }
 .log-action { color: #2563eb; font-weight: 600; }
+
+.search-section {
+    max-width: 63.5%;
+    margin-bottom: 1.5rem 0 2rem 0;
+}
+
+.search-form {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.search-input-wrapper {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.search-icon {
+    position: absolute;
+    left: 14px;
+    color: #2563eb;
+    pointer-events: none;
+}
+
+.search-input {
+    flex: 1;
+    padding: 12px 14px 12px 40px;
+    font-size: 1rem;
+    color: #0f172a;
+    background-color: #f8fafc;
+    border: 2px solid #cbd5e1;
+    border-radius: 8px;
+    outline: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+}
+
+.search-input::placeholder {
+    color: #64748b;
+    font-weight: 400;
+}
+
+.search-input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.search-btn {
+    padding: 14px 24px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #ffffff !important;
+    background-color: #406dcf;
+    border: 1px solid #cdb5e1;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+}
+
+.search-btn:hover {
+    background-color: #1d4ed8;
+}
