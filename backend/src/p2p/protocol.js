@@ -19,12 +19,19 @@ function createMessage(type, payload, source) {
 }
 
 function parseMessage(raw, maxBytes = 1_000_000) {
-  const serialized = typeof raw === "string" ? raw : JSON.stringify(raw);
+  const normalizedRaw = Buffer.isBuffer(raw) ? raw.toString("utf8") : raw;
+  const serialized =
+    typeof normalizedRaw === "string"
+      ? normalizedRaw
+      : JSON.stringify(normalizedRaw);
   if (Buffer.byteLength(serialized, "utf8") > maxBytes) {
     throw new RangeError("P2P message exceeds the configured size limit");
   }
 
-  const message = typeof raw === "string" ? JSON.parse(raw) : raw;
+  const message =
+    typeof normalizedRaw === "string"
+      ? JSON.parse(normalizedRaw)
+      : normalizedRaw;
   if (
     !message ||
     message.version !== PROTOCOL_VERSION ||
