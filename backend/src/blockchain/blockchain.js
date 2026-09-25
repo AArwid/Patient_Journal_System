@@ -90,6 +90,23 @@ class Blockchain {
     return normalizedBlock;
   }
 
+  replaceChain(chain, publicKey) {
+    if (!Array.isArray(chain) || chain.length <= this.#blocks.length) {
+      return false;
+    }
+
+    const normalizedChain = chain.map((block) =>
+      block instanceof Block ? block : new Block(block),
+    );
+
+    if (!this.validateChain(normalizedChain, publicKey)) {
+      return false;
+    }
+
+    this.#blocks = normalizedChain;
+    return true;
+  }
+
   validateChain(chain = this.#blocks, publicKey) {
     try {
       if (!Array.isArray(chain) || chain.length === 0) {
