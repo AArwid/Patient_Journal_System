@@ -24,21 +24,18 @@ vi diskuterade hur långt vi borde ha kommit tills nästa Daily-standupp-möte!
 
 Deltagare på mötet /Arwid /Ellinor /Fredrik
 
+## 2026-09-22 //Fredrik
 
-## 2026-09-18 //Fredrik
+Ellinor visar hur långt hon kommit med frontend. Många av delarna är klara.
 
-Vi gick igenom koden som skrivits hittils och blivit pushat till Github. 
-Det såg bra ut och mergades till main.
+Fredrik visar att express Api delarna snart är klara. Vi kommer behöva prata ihop oss om hur vi ska knyta an varandras delar.
 
-Vi diskuterade en del frontend och Ellinor kommer pusha upp sin kod relaterat till det innan tisdagens möte.
+vi diskuterade hur långt vi borde ha kommit tills nästa Daily-standupp-möte!
 
 Deltagare på mötet /Arwid /Ellinor /Fredrik
-<<<<<<< HEAD
 
 ## 2026-09-25 // Arwid
 
 Idag så hanterade vi pullrequests och mergade samtliga till main, diskuterade att Ahmed inte har närvarat eller medverkat på något än så länge så vi bestämmde att Arwid ska göra hans del p2p nätverk och middleware, Bestämmde ett ytterliggare standuppmöte på måndag den 09/28 för att säkerställa att vi ligger bra till och börja kika på sista delen inför presentationen och fixa buggar och kolla så allt fungerar som det ska.
 
 Deltagare på mötet Arwid, Fredrik
-=======
->>>>>>> 41521c394d1ae2d85fc34696bf52a130d1e915fd
