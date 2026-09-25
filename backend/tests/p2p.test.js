@@ -1,9 +1,14 @@
 import assert from "node:assert/strict";
+import { generateKeyPairSync } from "node:crypto";
 import { EventEmitter } from "node:events";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import test from "node:test";
 
 import Blockchain from "../src/blockchain/blockchain.js";
 import { PeerNode } from "../src/p2p/peer-node.js";
+import { createHandshake, verifyHandshake } from "../src/p2p/handshake.js";
 
 const signature =
   "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==";
@@ -118,4 +123,99 @@ test("removes peers when their socket closes", () => {
   socket.emit("close");
 
   assert.deepEqual(node.getPeerIds(), []);
+});
+
+test("authenticates a peer handshake and rejects tampering", () => {
+  const firstKeys = generateKeyPairSync("ed25519");
+  const handshake = createHandshake(
+    "hospital-a",
+    firstKeys.privateKey,
+    firstKeys.publicKey,
+  );
+
+  assert.equal(verifyHandshake(handshake, firstKeys.publicKey), true);
+
+  const tamperedHandshake = structuredClone(handshake);
+  tamperedHandshake.payload.nodeId = "attacker";
+  assert.equal(verifyHandshake(tamperedHandshake, firstKeys.publicKey), false);
+});
+
+test("rejects a handshake from an untrusted public key", () => {
+  const firstKeys = generateKeyPairSync("ed25519");
+  const trustedKeys = generateKeyPairSync("ed25519");
+  const handshake = createHandshake(
+    "hospital-a",
+    firstKeys.privateKey,
+    firstKeys.publicKey,
+  );
+
+  assert.equal(verifyHandshake(handshake, trustedKeys.publicKey), false);
+});
+
+test("restarted offline peer catches up from the persisted chain", () => {
+  const directory = mkdtempSync(join(tmpdir(), "patient-journal-p2p-"));
+  const firstPath = join(directory, "hospital-a.json");
+  const secondPath = join(directory, "hospital-b.json");
+
+  try {
+    const firstBlockchain = new Blockchain({ storagePath: firstPath });
+    appendBlocks(firstBlockchain, 2);
+
+    const restartedSecondBlockchain = new Blockchain({
+      storagePath: secondPath,
+    });
+    const first = new PeerNode({
+      blockchain: firstBlockchain,
+      nodeId: "hospital-a",
+    });
+    const second = new PeerNode({
+      blockchain: restartedSecondBlockchain,
+      nodeId: "hospital-b",
+    });
+    const firstSocket = new MockSocket();
+    const secondSocket = new MockSocket();
+    firstSocket.connect(secondSocket);
+
+    second.addPeer("hospital-a", secondSocket);
+    first.addPeer("hospital-b", firstSocket);
+    second.requestSync("hospital-a");
+
+    assert.deepEqual(
+      restartedSecondBlockchain.getChain(),
+      firstBlockchain.getChain(),
+    );
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test("broadcasts notes between connected peers without using the chain", () => {
+  const first = new PeerNode({
+    blockchain: new Blockchain(),
+    nodeId: "hospital-a",
+  });
+  const second = new PeerNode({
+    blockchain: new Blockchain(),
+    nodeId: "hospital-b",
+  });
+  const firstSocket = new MockSocket();
+  const secondSocket = new MockSocket();
+  const received = [];
+  firstSocket.connect(secondSocket);
+  second.on("note:received", ({ note }) => received.push(note));
+
+  first.addPeer("hospital-b", firstSocket);
+  second.addPeer("hospital-a", secondSocket);
+  const note = {
+    id: 1,
+    patient_id: 1,
+    author_user_id: 7,
+    content: "Visible note",
+    visibility: "all",
+  };
+
+  first.broadcastNote(note);
+
+  assert.deepEqual(received, [note]);
+  assert.equal(second.getPeerIds().length, 1);
 });

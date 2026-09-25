@@ -1,8 +1,11 @@
 const PROTOCOL_VERSION = 1;
+const HANDSHAKE_TYPE = "peer.handshake";
 const MESSAGE_TYPES = Object.freeze({
   CHAIN_REQUEST: "chain.request",
   CHAIN_RESPONSE: "chain.response",
   BLOCK_BROADCAST: "block.broadcast",
+  NOTE_BROADCAST: "note.broadcast",
+  HANDSHAKE: HANDSHAKE_TYPE,
 });
 
 function createMessage(type, payload, source) {
@@ -47,4 +50,10 @@ function parseMessage(raw, maxBytes = 1_000_000) {
   return message;
 }
 
-export { MESSAGE_TYPES, PROTOCOL_VERSION, createMessage, parseMessage };
+export {
+  HANDSHAKE_TYPE,
+  MESSAGE_TYPES,
+  PROTOCOL_VERSION,
+  createMessage,
+  parseMessage,
+};

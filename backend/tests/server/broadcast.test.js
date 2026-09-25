@@ -8,6 +8,7 @@ const broadcastClient = require("../../src/server/services/broadcastClient");
 const usersRepository = require("../../src/server/db/users.repository");
 const patientsRepository = require("../../src/server/db/patients.repository");
 const { hashPassword } = require("../../src/server/utils/password");
+const { isNoteVisible } = broadcastClient;
 
 let patient;
 
@@ -31,6 +32,18 @@ async function loginAs(email) {
 }
 
 describe("note broadcasting", () => {
+  it("enforces note visibility for peer subscribers", () => {
+    const privateNote = { visibility: "private", author_user_id: 4 };
+    const staffNote = { visibility: "staff", author_user_id: 4 };
+    const allNote = { visibility: "all", author_user_id: 4 };
+
+    expect(isNoteVisible(privateNote, { id: 4, role: "patient" })).toBe(true);
+    expect(isNoteVisible(privateNote, { id: 5, role: "doctor" })).toBe(false);
+    expect(isNoteVisible(staffNote, { id: 5, role: "patient" })).toBe(false);
+    expect(isNoteVisible(staffNote, { id: 5, role: "nurse" })).toBe(true);
+    expect(isNoteVisible(allNote, { id: 5, role: "patient" })).toBe(true);
+  });
+
   it("broadcasts a newly created note to the P2P/broadcast layer", async () => {
     const received = [];
     broadcastClient.onNote((note) => received.push(note));

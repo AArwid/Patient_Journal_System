@@ -1,6 +1,11 @@
 import { EventEmitter } from "node:events";
 
 import { MESSAGE_TYPES, createMessage, parseMessage } from "./protocol.js";
+import {
+  HANDSHAKE_TYPE,
+  createHandshake,
+  verifyHandshake,
+} from "./handshake.js";
 
 const P2P_EVENT = "p2p:message";
 
@@ -36,6 +41,7 @@ class PeerNode extends EventEmitter {
   #trustedPublicKeys;
   #nodeId;
   #maxMessageBytes;
+  #privateKey;
   #peers = new Map();
 
   constructor({
@@ -43,6 +49,7 @@ class PeerNode extends EventEmitter {
     nodeId,
     publicKey,
     trustedPublicKeys,
+    privateKey,
     maxMessageBytes = 1_000_000,
   }) {
     super();
@@ -58,6 +65,7 @@ class PeerNode extends EventEmitter {
     this.#trustedPublicKeys = trustedPublicKeys;
     this.#nodeId = nodeId;
     this.#maxMessageBytes = maxMessageBytes;
+    this.#privateKey = privateKey;
   }
 
   addPeer(peerId, socket) {
@@ -65,7 +73,11 @@ class PeerNode extends EventEmitter {
       throw new TypeError("peerId must be a non-empty string");
     }
 
-    const peer = { socket, peerId };
+    const peer = {
+      socket,
+      peerId,
+      authenticated: !this.#privateKey || !this.#publicKey,
+    };
     this.#peers.set(peerId, peer);
     listenOnSocket(socket, (rawMessage) => {
       this.#handleMessage(peer, rawMessage);
@@ -76,7 +88,8 @@ class PeerNode extends EventEmitter {
       this.removePeer(peerId);
     });
 
-    this.#send(peer, MESSAGE_TYPES.CHAIN_REQUEST, {});
+    if (peer.authenticated) this.#requestChain(peer);
+    else this.#sendHandshake(peer);
     this.emit("peer:connected", { peerId });
     return () => this.removePeer(peerId);
   }
@@ -97,6 +110,14 @@ class PeerNode extends EventEmitter {
     }
   }
 
+  broadcastNote(note, exceptPeerId) {
+    for (const peer of this.#peers.values()) {
+      if (peer.peerId !== exceptPeerId) {
+        this.#send(peer, MESSAGE_TYPES.NOTE_BROADCAST, { note });
+      }
+    }
+  }
+
   requestSync(peerId) {
     const peer = this.#peers.get(peerId);
     if (!peer) {
@@ -110,7 +131,19 @@ class PeerNode extends EventEmitter {
   }
 
   #send(peer, type, payload) {
+    if (!peer.authenticated) return;
     sendOnSocket(peer.socket, createMessage(type, payload, this.#nodeId));
+  }
+
+  #sendHandshake(peer) {
+    sendOnSocket(
+      peer.socket,
+      createHandshake(this.#nodeId, this.#privateKey, this.#publicKey),
+    );
+  }
+
+  #requestChain(peer) {
+    this.#send(peer, MESSAGE_TYPES.CHAIN_REQUEST, {});
   }
 
   #handleMessage(peer, rawMessage) {
@@ -118,6 +151,14 @@ class PeerNode extends EventEmitter {
       const message = parseMessage(rawMessage, this.#maxMessageBytes);
       if (message.source === this.#nodeId) {
         return;
+      }
+
+      if (message.type === HANDSHAKE_TYPE) {
+        this.#handleHandshake(peer, message);
+        return;
+      }
+      if (!peer.authenticated) {
+        throw new Error("Peer handshake required");
       }
 
       switch (message.type) {
@@ -132,12 +173,33 @@ class PeerNode extends EventEmitter {
         case MESSAGE_TYPES.BLOCK_BROADCAST:
           this.#handleBlock(peer, message.payload, message.source);
           break;
+        case MESSAGE_TYPES.NOTE_BROADCAST:
+          this.#handleNote(peer, message.payload);
+          break;
         default:
           throw new TypeError("Unsupported P2P message type");
       }
     } catch (error) {
       this.emit("sync:error", { peerId: peer.peerId, error });
     }
+  }
+
+  #handleHandshake(peer, message) {
+    const trustedKey = this.#trustedPublicKeys?.[message.source];
+    if (this.#privateKey && !trustedKey) {
+      throw new Error(
+        `No trusted public key configured for peer: ${message.source}`,
+      );
+    }
+    if (!verifyHandshake(message, trustedKey)) {
+      throw new Error(`Peer handshake failed: ${message.source}`);
+    }
+    peer.authenticated = true;
+    this.emit("peer:authenticated", {
+      peerId: peer.peerId,
+      source: message.source,
+    });
+    this.#requestChain(peer);
   }
 
   #handleChainResponse(peer, payload, source) {
@@ -174,6 +236,14 @@ class PeerNode extends EventEmitter {
       this.emit("block:deferred", { peerId: peer.peerId, error });
       this.requestSync(peer.peerId);
     }
+  }
+
+  #handleNote(peer, payload) {
+    if (!payload?.note || typeof payload.note !== "object") {
+      throw new TypeError("Note broadcast must contain a note");
+    }
+    this.emit("note:received", { peerId: peer.peerId, note: payload.note });
+    this.broadcastNote(payload.note, peer.peerId);
   }
 
   #publicKeyFor(peerId, source) {
