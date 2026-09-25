@@ -34,3 +34,8 @@ vi diskuterade hur långt vi borde ha kommit tills nästa Daily-standupp-möte!
 
 Deltagare på mötet /Arwid /Ellinor /Fredrik
 
+## 2026-09-25 // Arwid
+
+Idag så hanterade vi pullrequests och mergade samtliga till main, diskuterade att Ahmed inte har närvarat eller medverkat på något än så länge så vi bestämmde att Arwid ska göra hans del p2p nätverk och middleware, Bestämmde ett ytterliggare standuppmöte på måndag den 09/28 för att säkerställa att vi ligger bra till och börja kika på sista delen inför presentationen och fixa buggar och kolla så allt fungerar som det ska.
+
+Deltagare på mötet Arwid, Fredrik
