@@ -33,11 +33,18 @@ function listenOnSocket(socket, handler) {
 class PeerNode extends EventEmitter {
   #blockchain;
   #publicKey;
+  #trustedPublicKeys;
   #nodeId;
   #maxMessageBytes;
   #peers = new Map();
 
-  constructor({ blockchain, nodeId, publicKey, maxMessageBytes = 1_000_000 }) {
+  constructor({
+    blockchain,
+    nodeId,
+    publicKey,
+    trustedPublicKeys,
+    maxMessageBytes = 1_000_000,
+  }) {
     super();
     if (!blockchain || typeof blockchain.getChain !== "function") {
       throw new TypeError("A blockchain instance is required");
@@ -48,6 +55,7 @@ class PeerNode extends EventEmitter {
 
     this.#blockchain = blockchain;
     this.#publicKey = publicKey;
+    this.#trustedPublicKeys = trustedPublicKeys;
     this.#nodeId = nodeId;
     this.#maxMessageBytes = maxMessageBytes;
   }
@@ -119,10 +127,10 @@ class PeerNode extends EventEmitter {
           });
           break;
         case MESSAGE_TYPES.CHAIN_RESPONSE:
-          this.#handleChainResponse(peer, message.payload);
+          this.#handleChainResponse(peer, message.payload, message.source);
           break;
         case MESSAGE_TYPES.BLOCK_BROADCAST:
-          this.#handleBlock(peer, message.payload);
+          this.#handleBlock(peer, message.payload, message.source);
           break;
         default:
           throw new TypeError("Unsupported P2P message type");
@@ -132,14 +140,14 @@ class PeerNode extends EventEmitter {
     }
   }
 
-  #handleChainResponse(peer, payload) {
+  #handleChainResponse(peer, payload, source) {
     if (!payload || !Array.isArray(payload.chain)) {
       throw new TypeError("Chain response must contain a chain array");
     }
 
     const replaced = this.#blockchain.replaceChain(
       payload.chain,
-      this.#publicKey,
+      this.#publicKeyFor(peer.peerId, source),
     );
     this.emit(replaced ? "chain:replaced" : "chain:unchanged", {
       peerId: peer.peerId,
@@ -147,13 +155,16 @@ class PeerNode extends EventEmitter {
     });
   }
 
-  #handleBlock(peer, payload) {
+  #handleBlock(peer, payload, source) {
     if (!payload || !payload.block) {
       throw new TypeError("Block broadcast must contain a block");
     }
 
     try {
-      this.#blockchain.appendBlock(payload.block, this.#publicKey);
+      this.#blockchain.appendBlock(
+        payload.block,
+        this.#publicKeyFor(peer.peerId, source),
+      );
       this.emit("block:appended", {
         peerId: peer.peerId,
         block: payload.block,
@@ -163,6 +174,16 @@ class PeerNode extends EventEmitter {
       this.emit("block:deferred", { peerId: peer.peerId, error });
       this.requestSync(peer.peerId);
     }
+  }
+
+  #publicKeyFor(peerId, source) {
+    if (!this.#trustedPublicKeys) return this.#publicKey;
+
+    const publicKey = this.#trustedPublicKeys[source];
+    if (!publicKey) {
+      throw new Error(`No trusted public key configured for peer: ${source}`);
+    }
+    return publicKey;
   }
 }
 

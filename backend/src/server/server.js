@@ -11,6 +11,7 @@ server.listen(config.port, async () => {
     server,
     nodeId: config.serverId,
     peerUrls: config.peerUrls,
+    peerPublicKeys: config.peerPublicKeys,
   });
   broadcastClient.setP2PTransport(p2p);
   console.log(

@@ -1,4 +1,6 @@
 const { WebSocketServer, WebSocket } = require("ws");
+const { createPublicKey } = require("node:crypto");
+const { readFileSync } = require("node:fs");
 const auditChainClient = require("./auditChainClient");
 
 function toWebSocketUrl(value) {
@@ -13,6 +15,7 @@ async function createP2PRuntime({
   server,
   nodeId,
   peerUrls,
+  peerPublicKeys = {},
   reconnectDelayMs = 1_000,
   maxReconnectDelayMs = 10_000,
 }) {
@@ -20,7 +23,18 @@ async function createP2PRuntime({
     import("../../p2p/index.js"),
     auditChainClient.getBlockchain(),
   ]);
-  const node = new PeerNode({ blockchain, nodeId });
+  const trustedPublicKeys = Object.fromEntries(
+    Object.entries(peerPublicKeys).map(([peerId, publicKeyPath]) => [
+      peerId,
+      createPublicKey(readFileSync(publicKeyPath)),
+    ]),
+  );
+  const node = new PeerNode({
+    blockchain,
+    nodeId,
+    trustedPublicKeys:
+      Object.keys(trustedPublicKeys).length > 0 ? trustedPublicKeys : undefined,
+  });
   const webSocketServer = new WebSocketServer({ server, path: "/p2p" });
   const sockets = new Set();
   const reconnectTimers = new Set();
