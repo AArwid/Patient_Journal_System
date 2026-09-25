@@ -24,13 +24,12 @@ vi diskuterade hur långt vi borde ha kommit tills nästa Daily-standupp-möte!
 
 Deltagare på mötet /Arwid /Ellinor /Fredrik
 
-## 2026-09-22 //Fredrik
 
-Ellinor visar hur långt hon kommit med frontend. Många av delarna är klara.
+## 2026-09-18 //Fredrik
 
-Fredrik visar att express Api delarna snart är klara. Vi kommer behöva prata ihop oss om hur vi ska knyta an varandras delar.
+Vi gick igenom koden som skrivits hittils och blivit pushat till Github. 
+Det såg bra ut och mergades till main.
 
-vi diskuterade hur långt vi borde ha kommit tills nästa Daily-standupp-möte!
+Vi diskuterade en del frontend och Ellinor kommer pusha upp sin kod relaterat till det innan tisdagens möte.
 
 Deltagare på mötet /Arwid /Ellinor /Fredrik
-
