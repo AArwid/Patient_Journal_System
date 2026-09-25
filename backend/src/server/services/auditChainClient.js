@@ -1,6 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { generateKeyPairSync } = require("node:crypto");
+const config = require("../config");
 
 let blockchainPromise;
 let signingKeysPromise;
@@ -56,7 +57,8 @@ async function getSigningKeys() {
 function getBlockchain() {
   if (!blockchainPromise) {
     blockchainPromise = import("../../blockchain/blockchain.js").then(
-      ({ default: Blockchain }) => new Blockchain(),
+      ({ default: Blockchain }) =>
+        new Blockchain({ storagePath: config.blockchainPath }),
     );
   }
   return blockchainPromise;

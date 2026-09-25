@@ -86,6 +86,9 @@ blockchain-modulen i `src/blockchain/`. P2P-runtime använder WebSocket och
 ansluter till peers
 via `PEER_URLS`.
 
+Audit-block sparas i `BLOCKCHAIN_PATH` och laddas tillbaka vid serverstart.
+Filen skrivs atomiskt och hela kedjan valideras innan den används.
+
 Varje server skapar automatiskt ett Ed25519-nyckelpar i
 `BLOCKCHAIN_KEY_DIRECTORY`. Ange peer-servrarnas publika nycklar med
 `PEER_PUBLIC_KEYS`, till exempel `hospital-2=./keys/hospital-2.public.pem`.

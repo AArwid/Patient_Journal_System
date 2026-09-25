@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
 import { generateKeyPairSync } from "node:crypto";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import test from "node:test";
 
 import Block from "../src/blockchain/block.js";
@@ -11,6 +14,29 @@ test("starts with exactly one genesis block", () => {
 
   assert.equal(blockchain.getChain().length, 1);
   assert.equal(blockchain.getLatestBlock().index, 0);
+});
+
+test("loads persisted blocks after a restart", () => {
+  const directory = mkdtempSync(join(tmpdir(), "patient-journal-chain-"));
+  const storagePath = join(directory, "audit-blockchain.json");
+
+  try {
+    const firstInstance = new Blockchain({ storagePath });
+    firstInstance.appendBlock(
+      firstInstance.createBlock({
+        event: { type: "journal.accessed", recordId: "opaque-persisted" },
+        signature:
+          "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+        timestamp: "2026-09-16T12:00:00.000Z",
+      }),
+    );
+
+    const restartedInstance = new Blockchain({ storagePath });
+
+    assert.deepEqual(restartedInstance.getChain(), firstInstance.getChain());
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
 });
 
 test("creates and appends the next block", () => {
