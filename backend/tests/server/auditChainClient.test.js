@@ -1,4 +1,4 @@
-const auditChainClient = require("../src/services/auditChainClient");
+const auditChainClient = require("../../src/server/services/auditChainClient");
 
 describe("auditChainClient", () => {
   it("appends each event to the shared blockchain in order", async () => {

@@ -1,8 +1,27 @@
 {
-  "name": "patient-journal-blockchain",
+  "name": "patient-journal-server",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
-  "workspaces": [
-    "server"
-  ]
+  "description": "Express API for the Patient Journal System (SQL data + audit-log hooks into the blockchain/P2P layer).",
+  "main": "src/server/server.js",
+  "scripts": {
+    "start": "node src/server/server.js",
+    "dev": "node --watch src/server/server.js",
+    "seed": "node src/server/db/seed.js",
+    "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --runInBand tests/server"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^11.3.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
+  }
 }

@@ -102,3 +102,20 @@ test("malformed peer messages are rejected without changing the chain", () => {
   assert.equal(errors.length, 1);
   assert.equal(blockchain.getChain().length, 1);
 });
+
+test("removes peers when their socket closes", () => {
+  const node = new PeerNode({
+    blockchain: new Blockchain(),
+    nodeId: "hospital-a",
+  });
+  const socket = new MockSocket();
+  const remoteSocket = new MockSocket();
+  socket.connect(remoteSocket);
+
+  node.addPeer("hospital-b", socket);
+  assert.deepEqual(node.getPeerIds(), ["hospital-b"]);
+
+  socket.emit("close");
+
+  assert.deepEqual(node.getPeerIds(), []);
+});

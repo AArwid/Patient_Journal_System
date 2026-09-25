@@ -62,6 +62,11 @@ class PeerNode extends EventEmitter {
     listenOnSocket(socket, (rawMessage) => {
       this.#handleMessage(peer, rawMessage);
     });
+    socket.on?.("close", () => this.removePeer(peerId));
+    socket.on?.("error", (error) => {
+      this.emit("sync:error", { peerId, error });
+      this.removePeer(peerId);
+    });
 
     this.#send(peer, MESSAGE_TYPES.CHAIN_REQUEST, {});
     this.emit("peer:connected", { peerId });

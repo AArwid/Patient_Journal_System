@@ -7,12 +7,12 @@ loggas, så vi kan visa vem som tittat på vad.
 
 ## Mappstruktur
 
-- `../database/schema.sql` - SQL-schemat för backend
-- `src/db/` - SQLite-koppling + repositories för patients/users/notes
-- `src/middleware/` - requireAuth, requireRole, requirePatientAccess, auditLogger
-- `src/routes/` - auth-routes och patient/notes-routes
-- `src/services/` - auditChainClient, broadcastClient och P2P-runtime
-- `tests/` - alla tester (Jest + Supertest)
+- `database/schema.sql` - SQL-schemat för backend
+- `src/server/db/` - SQLite-koppling + repositories för patients/users/notes
+- `src/server/middleware/` - requireAuth, requireRole, requirePatientAccess, auditLogger
+- `src/server/routes/` - auth-routes och patient/notes-routes
+- `src/server/services/` - auditChainClient, broadcastClient och P2P-runtime
+- `tests/server/` - servertester (Jest + Supertest)
 
 Viktig grej: journaler och anteckningar ligger BARA i SQL. Access-loggarna
 (vem har kollat vad) hamnar aldrig i SQL utan skickas vidare till
@@ -21,7 +21,7 @@ blockkedjan istället, enligt GDPR-kravet i uppgiften.
 ## Komma igång
 
 ```bash
-cd backend/server
+cd backend
 npm install
 cp .env.example .env
 npm run seed
@@ -81,8 +81,9 @@ kommer aldrig in någonstans, den får 403 på allt. Det här är testat i
 
 ## Om blockkedjan och P2P-delen
 
-`services/auditChainClient.js` använder den gemensamma blockchain-modulen i
-`../src/blockchain/`. P2P-runtime använder WebSocket och ansluter till peers
+`src/server/services/auditChainClient.js` använder den gemensamma
+blockchain-modulen i `src/blockchain/`. P2P-runtime använder WebSocket och
+ansluter till peers
 via `PEER_URLS`.
 
 Blockformatet (`{ index, timestamp, previousHash, event, signature, hash }`)

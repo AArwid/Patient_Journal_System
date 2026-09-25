@@ -4,7 +4,7 @@ const UNSIGNED_SIGNATURE =
 
 function getBlockchain() {
   if (!blockchainPromise) {
-    blockchainPromise = import("../../../src/blockchain/blockchain.js").then(
+    blockchainPromise = import("../../blockchain/blockchain.js").then(
       ({ default: Blockchain }) => new Blockchain(),
     );
   }
