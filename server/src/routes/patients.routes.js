@@ -6,6 +6,7 @@ const requireRole = require('../middleware/requireRole');
 const requirePatientAccess = require('../middleware/requirePatientAccess');
 const auditLogger = require('../middleware/auditLogger');
 const auditChainClient = require('../services/auditChainClient');
+const broadcastClient = require('../services/broadcastClient');
 const { STAFF_ROLES } = require('../constants/roles');
 
 const router = express.Router();
@@ -42,6 +43,7 @@ router.post('/:id/notes', auditLogger('create_note'), requirePatientAccess, (req
     visibility,
   });
 
+  broadcastClient.broadcastNote(note);
   res.status(201).json({ note });
 });
 
