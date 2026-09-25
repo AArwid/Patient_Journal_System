@@ -11,7 +11,7 @@ function toWebSocketUrl(value) {
 
 async function createP2PRuntime({ server, nodeId, peerUrls }) {
   const [{ PeerNode }, blockchain] = await Promise.all([
-    import("../../../backend/src/p2p/index.js"),
+    import("../../../src/p2p/index.js"),
     auditChainClient.getBlockchain(),
   ]);
   const node = new PeerNode({ blockchain, nodeId });

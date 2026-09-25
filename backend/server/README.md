@@ -7,12 +7,12 @@ loggas, så vi kan visa vem som tittat på vad.
 
 ## Mappstruktur
 
-- `database/schema.sql` - SQL-schemat, delas av hela backend
-- `server/src/db/` - SQLite-koppling + repositories för patients/users/notes
-- `server/src/middleware/` - requireAuth, requireRole, requirePatientAccess, auditLogger
-- `server/src/routes/` - auth-routes och patient/notes-routes
-- `server/src/services/` - auditChainClient och broadcastClient (se längre ner)
-- `server/tests/` - alla tester (Jest + Supertest)
+- `../database/schema.sql` - SQL-schemat för backend
+- `src/db/` - SQLite-koppling + repositories för patients/users/notes
+- `src/middleware/` - requireAuth, requireRole, requirePatientAccess, auditLogger
+- `src/routes/` - auth-routes och patient/notes-routes
+- `src/services/` - auditChainClient, broadcastClient och P2P-runtime
+- `tests/` - alla tester (Jest + Supertest)
 
 Viktig grej: journaler och anteckningar ligger BARA i SQL. Access-loggarna
 (vem har kollat vad) hamnar aldrig i SQL utan skickas vidare till
@@ -21,7 +21,7 @@ blockkedjan istället, enligt GDPR-kravet i uppgiften.
 ## Komma igång
 
 ```bash
-cd server
+cd backend/server
 npm install
 cp .env.example .env
 npm run seed
@@ -81,12 +81,9 @@ kommer aldrig in någonstans, den får 403 på allt. Det här är testat i
 
 ## Om blockkedjan och P2P-delen
 
-`services/auditChainClient.js` och `services/broadcastClient.js` är just nu
-bara stubbar - de låtsas vara blockkedjan/P2P-nätverket så att jag kunnat
-bygga och testa min del utan att behöva vänta på Arwid och Ahmed. De har
-samma "gränssnitt" (samma funktioner in/ut) som deras riktiga moduler kommer
-ha, så när de är klara ska vi förhoppningsvis bara kunna byta ut innehållet
-i de här två filerna utan att röra resten av koden.
+`services/auditChainClient.js` använder den gemensamma blockchain-modulen i
+`../src/blockchain/`. P2P-runtime använder WebSocket och ansluter till peers
+via `PEER_URLS`.
 
 Blockformatet (`{ index, timestamp, previousHash, event, signature, hash }`)
 är samma som Arwid använder i sin blockchain-modul, så det borde stämma

@@ -1,0 +1,8 @@
+{
+  "name": "patient-journal-blockchain",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "server"
+  ]
+}
