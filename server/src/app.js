@@ -3,6 +3,7 @@ const cors = require('cors');
 const session = require('express-session');
 const config = require('./config');
 const authRoutes = require('./routes/auth.routes');
+const patientsRoutes = require('./routes/patients.routes');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -34,9 +35,9 @@ app.get('/api/health', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/patients', patientsRoutes);
 
-// Patient/notes routes are mounted in a follow-up PR:
-//   app.use('/api/patients', patientsRoutes);
+// Notes routes are mounted onto /api/patients in a follow-up PR.
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Not found' });
