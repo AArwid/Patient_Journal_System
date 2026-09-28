@@ -2,7 +2,7 @@ import Block from "./block.js";
 import { createGenesisBlock } from "./genesis.js";
 import { createBlock, createMerkleBatchBlock } from "./factory.js";
 import { loadChain, persistChain } from "./storage.js";
-import { validateSignature, verifyBlockSignature } from "./signing.js";
+import { validateSignature, verifyBlockSignatureWith } from "./signing.js";
 import {
   normalizeChain,
   validateChain,
@@ -63,7 +63,7 @@ class Blockchain {
       );
     }
 
-    if (publicKey && !verifyBlockSignature(normalizedBlock, publicKey)) {
+    if (!verifyBlockSignatureWith(normalizedBlock, publicKey)) {
       throw new Error("Block signature verification failed");
     }
 

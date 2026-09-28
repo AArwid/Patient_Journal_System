@@ -1,5 +1,5 @@
 import { sign, verify, createPublicKey } from "node:crypto";
-import { HANDSHAKE_TYPE } from "./protocol.js";
+import { HANDSHAKE_TYPE, PROTOCOL_VERSION } from "./protocol.js";
 
 function handshakePayload(nodeId, publicKey) {
   return {
@@ -15,6 +15,9 @@ function serializedPayload(payload) {
 function createHandshake(nodeId, privateKey, publicKey) {
   const payload = handshakePayload(nodeId, publicKey);
   return {
+    // A handshake travels through parseMessage like any other frame, so it
+    // must carry the protocol version.
+    version: PROTOCOL_VERSION,
     type: HANDSHAKE_TYPE,
     source: nodeId,
     payload,

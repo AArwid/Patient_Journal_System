@@ -40,4 +40,8 @@ function findVisibleForPatient(patientId, viewer) {
   });
 }
 
-module.exports = { create, findById, findVisibleForPatient };
+function countForPatient(patientId) {
+  return db.prepare('SELECT COUNT(*) AS count FROM notes WHERE patient_id = ?').get(patientId).count;
+}
+
+module.exports = { create, findById, findVisibleForPatient, countForPatient };

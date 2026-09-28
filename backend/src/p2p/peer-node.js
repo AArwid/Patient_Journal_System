@@ -1,6 +1,11 @@
 import { EventEmitter } from "node:events";
 
-import { MESSAGE_TYPES, createMessage, parseMessage } from "./protocol.js";
+import {
+  MESSAGE_TYPES,
+  createMessage,
+  isReplicableNote,
+  parseMessage,
+} from "./protocol.js";
 import {
   HANDSHAKE_TYPE,
   createHandshake,
@@ -111,6 +116,10 @@ class PeerNode extends EventEmitter {
   }
 
   broadcastNote(note, exceptPeerId) {
+    if (!isReplicableNote(note)) {
+      this.emit("note:withheld", { visibility: note?.visibility });
+      return;
+    }
     for (const peer of this.#peers.values()) {
       if (peer.peerId !== exceptPeerId) {
         this.#send(peer, MESSAGE_TYPES.NOTE_BROADCAST, { note });
@@ -168,10 +177,10 @@ class PeerNode extends EventEmitter {
           });
           break;
         case MESSAGE_TYPES.CHAIN_RESPONSE:
-          this.#handleChainResponse(peer, message.payload, message.source);
+          this.#handleChainResponse(peer, message.payload);
           break;
         case MESSAGE_TYPES.BLOCK_BROADCAST:
-          this.#handleBlock(peer, message.payload, message.source);
+          this.#handleBlock(peer, message.payload);
           break;
         case MESSAGE_TYPES.NOTE_BROADCAST:
           this.#handleNote(peer, message.payload);
@@ -202,14 +211,14 @@ class PeerNode extends EventEmitter {
     this.#requestChain(peer);
   }
 
-  #handleChainResponse(peer, payload, source) {
+  #handleChainResponse(peer, payload) {
     if (!payload || !Array.isArray(payload.chain)) {
       throw new TypeError("Chain response must contain a chain array");
     }
 
     const replaced = this.#blockchain.replaceChain(
       payload.chain,
-      this.#publicKeyFor(peer.peerId, source),
+      this.#chainKeyResolver(),
     );
     this.emit(replaced ? "chain:replaced" : "chain:unchanged", {
       peerId: peer.peerId,
@@ -217,16 +226,13 @@ class PeerNode extends EventEmitter {
     });
   }
 
-  #handleBlock(peer, payload, source) {
+  #handleBlock(peer, payload) {
     if (!payload || !payload.block) {
       throw new TypeError("Block broadcast must contain a block");
     }
 
     try {
-      this.#blockchain.appendBlock(
-        payload.block,
-        this.#publicKeyFor(peer.peerId, source),
-      );
+      this.#blockchain.appendBlock(payload.block, this.#chainKeyResolver());
       this.emit("block:appended", {
         peerId: peer.peerId,
         block: payload.block,
@@ -242,18 +248,27 @@ class PeerNode extends EventEmitter {
     if (!payload?.note || typeof payload.note !== "object") {
       throw new TypeError("Note broadcast must contain a note");
     }
+    // Peer input is untrusted: a peer must never hand us a note whose
+    // visibility forbids replication.
+    if (!isReplicableNote(payload.note)) {
+      throw new Error(
+        `Peer sent a note that must not replicate: ${payload.note.visibility}`,
+      );
+    }
     this.emit("note:received", { peerId: peer.peerId, note: payload.note });
     this.broadcastNote(payload.note, peer.peerId);
   }
 
-  #publicKeyFor(peerId, source) {
+  // Blocks in a replicated chain are signed by whichever hospital recorded the
+  // event, so each one is verified against that hospital's key.
+  #chainKeyResolver() {
     if (!this.#trustedPublicKeys) return this.#publicKey;
 
-    const publicKey = this.#trustedPublicKeys[source];
-    if (!publicKey) {
-      throw new Error(`No trusted public key configured for peer: ${source}`);
-    }
-    return publicKey;
+    return (block) => {
+      const signer = block?.event?.serverId;
+      if (signer === this.#nodeId) return this.#publicKey;
+      return this.#trustedPublicKeys[signer];
+    };
   }
 }
 

@@ -44,6 +44,63 @@ describe("note broadcasting", () => {
     expect(isNoteVisible(allNote, { id: 5, role: "patient" })).toBe(true);
   });
 
+  it("keeps notes away from viewers with no identity or no rights", () => {
+    const privateNote = { visibility: "private", author_user_id: 4 };
+    const staffNote = { visibility: "staff", author_user_id: 4 };
+    const allNote = { visibility: "all", author_user_id: 4 };
+
+    // A subscriber without a viewer must not be a way around the rules.
+    expect(isNoteVisible(privateNote, undefined)).toBe(false);
+    expect(isNoteVisible(staffNote, undefined)).toBe(false);
+    expect(isNoteVisible(allNote, undefined)).toBe(true);
+
+    const unauthorized = { id: 9, role: "unauthorized" };
+    expect(isNoteVisible(privateNote, unauthorized)).toBe(false);
+    expect(isNoteVisible(staffNote, unauthorized)).toBe(false);
+    expect(isNoteVisible(allNote, unauthorized)).toBe(false);
+  });
+
+  it("does not leak another patient's note to a patient viewer", () => {
+    const note = { visibility: "all", author_user_id: 1, patient_id: 7 };
+
+    expect(isNoteVisible(note, { id: 4, role: "patient", patientId: 7 })).toBe(
+      true,
+    );
+    expect(isNoteVisible(note, { id: 5, role: "patient", patientId: 8 })).toBe(
+      false,
+    );
+  });
+
+  it("only replicates staff and all notes to peers", () => {
+    const sent = [];
+    broadcastClient.setP2PTransport({
+      broadcastAccessEvent() {},
+      broadcastNote: (note) => sent.push(note),
+    });
+
+    try {
+      broadcastClient.broadcastNote({ id: 1, visibility: "private" });
+      expect(sent).toHaveLength(0);
+
+      broadcastClient.broadcastNote({ id: 2, visibility: "staff" });
+      broadcastClient.broadcastNote({ id: 3, visibility: "all" });
+      expect(sent.map((note) => note.id)).toEqual([2, 3]);
+    } finally {
+      broadcastClient.setP2PTransport(null);
+    }
+  });
+
+  it("drops a private note arriving from a peer", () => {
+    const received = [];
+    broadcastClient.onNote((note) => received.push(note));
+
+    broadcastClient.receivePeerNote({ id: 4, visibility: "private" });
+    expect(received).toHaveLength(0);
+
+    broadcastClient.receivePeerNote({ id: 5, visibility: "all" });
+    expect(received.map((note) => note.id)).toEqual([5]);
+  });
+
   it("broadcasts a newly created note to the P2P/broadcast layer", async () => {
     const received = [];
     broadcastClient.onNote((note) => received.push(note));

@@ -50,4 +50,21 @@ function verifyBlockSignature(block, publicKey) {
   }
 }
 
-export { signBlockPayload, validateSignature, verifyBlockSignature };
+// A replicated chain carries blocks signed by different hospitals, so callers
+// may pass a resolver that returns the right key for each block. A resolver
+// that yields no key means the signer is unknown and the block is rejected.
+function verifyBlockSignatureWith(block, publicKeyOrResolver) {
+  if (typeof publicKeyOrResolver === "function") {
+    const publicKey = publicKeyOrResolver(block);
+    return publicKey ? verifyBlockSignature(block, publicKey) : false;
+  }
+  if (!publicKeyOrResolver) return true;
+  return verifyBlockSignature(block, publicKeyOrResolver);
+}
+
+export {
+  signBlockPayload,
+  validateSignature,
+  verifyBlockSignature,
+  verifyBlockSignatureWith,
+};

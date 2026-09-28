@@ -8,6 +8,19 @@ const MESSAGE_TYPES = Object.freeze({
   HANDSHAKE: HANDSHAKE_TYPE,
 });
 
+// A 'private' note is readable only by its author, who exists solely on the
+// server that owns the note, so its content must never cross the network.
+const REPLICABLE_NOTE_VISIBILITIES = Object.freeze(["staff", "all"]);
+
+function isReplicableNote(note) {
+  return (
+    Boolean(note) &&
+    typeof note === "object" &&
+    !Array.isArray(note) &&
+    REPLICABLE_NOTE_VISIBILITIES.includes(note.visibility)
+  );
+}
+
 function createMessage(type, payload, source) {
   if (!Object.values(MESSAGE_TYPES).includes(type)) {
     throw new TypeError(`Unsupported P2P message type: ${type}`);
@@ -54,6 +67,8 @@ export {
   HANDSHAKE_TYPE,
   MESSAGE_TYPES,
   PROTOCOL_VERSION,
+  REPLICABLE_NOTE_VISIBILITIES,
   createMessage,
+  isReplicableNote,
   parseMessage,
 };

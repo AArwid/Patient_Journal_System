@@ -39,7 +39,33 @@ async function createP2PRuntime({
     trustedPublicKeys:
       Object.keys(trustedPublicKeys).length > 0 ? trustedPublicKeys : undefined,
   });
-  node.on("note:received", ({ note }) => broadcastClient.receivePeerNote(note));
+  node.on("note:received", ({ peerId, note }) => {
+    // Metadata only - journal content must never reach the logs.
+    console.log(
+      `[${nodeId}] note #${note.id} (${note.visibility}) received from ${peerId}`,
+    );
+    broadcastClient.receivePeerNote(note);
+  });
+  node.on("note:withheld", ({ visibility }) => {
+    console.log(`[${nodeId}] note withheld from peers (${visibility})`);
+  });
+  node.on("peer:authenticated", ({ source }) => {
+    console.log(`[${nodeId}] peer authenticated: ${source}`);
+  });
+  node.on("block:appended", ({ peerId, block }) => {
+    console.log(`[${nodeId}] audit block #${block.index} from ${peerId}`);
+  });
+  node.on("block:deferred", ({ peerId, error }) => {
+    console.warn(
+      `[${nodeId}] block from ${peerId} deferred, resyncing: ${error.message}`,
+    );
+  });
+  node.on("chain:replaced", ({ peerId, length }) => {
+    console.log(`[${nodeId}] chain replaced from ${peerId} (${length} blocks)`);
+  });
+  node.on("sync:error", ({ peerId, error }) => {
+    console.warn(`[${nodeId}] sync error from ${peerId}: ${error.message}`);
+  });
   const webSocketServer = new WebSocketServer({ server, path: "/p2p" });
   const sockets = new Set();
   const reconnectTimers = new Set();

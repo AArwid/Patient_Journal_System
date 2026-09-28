@@ -9,6 +9,11 @@ import test from "node:test";
 import Blockchain from "../src/blockchain/blockchain.js";
 import { PeerNode } from "../src/p2p/peer-node.js";
 import { createHandshake, verifyHandshake } from "../src/p2p/handshake.js";
+import {
+  HANDSHAKE_TYPE,
+  PROTOCOL_VERSION,
+  parseMessage,
+} from "../src/p2p/protocol.js";
 
 const signature =
   "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==";
@@ -218,4 +223,89 @@ test("broadcasts notes between connected peers without using the chain", () => {
 
   assert.deepEqual(received, [note]);
   assert.equal(second.getPeerIds().length, 1);
+});
+
+test("a handshake survives protocol parsing", () => {
+  const keys = generateKeyPairSync("ed25519");
+  const handshake = createHandshake(
+    "hospital-a",
+    keys.privateKey,
+    keys.publicKey,
+  );
+
+  // A handshake goes through parseMessage like any other frame, so a missing
+  // version field would reject every real peer connection.
+  const parsed = parseMessage(JSON.stringify(handshake));
+
+  assert.equal(parsed.type, HANDSHAKE_TYPE);
+  assert.equal(parsed.version, PROTOCOL_VERSION);
+  assert.equal(verifyHandshake(parsed, keys.publicKey), true);
+});
+
+test("never sends a private note to a peer", () => {
+  const first = new PeerNode({
+    blockchain: new Blockchain(),
+    nodeId: "hospital-a",
+  });
+  const second = new PeerNode({
+    blockchain: new Blockchain(),
+    nodeId: "hospital-b",
+  });
+  const firstSocket = new MockSocket();
+  const secondSocket = new MockSocket();
+  const received = [];
+  const withheld = [];
+  firstSocket.connect(secondSocket);
+  second.on("note:received", ({ note }) => received.push(note));
+  first.on("note:withheld", (event) => withheld.push(event));
+
+  first.addPeer("hospital-b", firstSocket);
+  second.addPeer("hospital-a", secondSocket);
+
+  first.broadcastNote({
+    id: 2,
+    patient_id: 1,
+    author_user_id: 7,
+    content: "Author-only reminder",
+    visibility: "private",
+  });
+
+  assert.deepEqual(received, []);
+  assert.deepEqual(withheld, [{ visibility: "private" }]);
+});
+
+test("rejects a private note pushed by a peer", () => {
+  const receiver = new PeerNode({
+    blockchain: new Blockchain(),
+    nodeId: "hospital-b",
+  });
+  const senderSocket = new MockSocket();
+  const receiverSocket = new MockSocket();
+  const received = [];
+  const errors = [];
+  senderSocket.connect(receiverSocket);
+  receiver.on("note:received", ({ note }) => received.push(note));
+  receiver.on("sync:error", ({ error }) => errors.push(error));
+
+  receiver.addPeer("hospital-a", receiverSocket);
+
+  // A malicious/buggy peer bypasses its own broadcastNote guard.
+  senderSocket.emit("p2p:message", {
+    version: 1,
+    type: "note.broadcast",
+    source: "hospital-a",
+    payload: {
+      note: {
+        id: 3,
+        patient_id: 1,
+        author_user_id: 7,
+        content: "Leaked private note",
+        visibility: "private",
+      },
+    },
+  });
+
+  assert.deepEqual(received, []);
+  assert.equal(errors.length, 1);
+  assert.match(errors[0].message, /must not replicate/);
 });

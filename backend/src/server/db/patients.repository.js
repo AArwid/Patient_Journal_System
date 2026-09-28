@@ -6,8 +6,16 @@ function findById(id) {
 
 function search(query) {
   return db
-    .prepare('SELECT id, full_name, date_of_birth FROM patients WHERE full_name LIKE ? ORDER BY full_name LIMIT 20')
-    .all(`%${query}%`);
+    .prepare(
+      `SELECT id, full_name, date_of_birth FROM patients
+       WHERE full_name LIKE ? OR personal_number LIKE ?
+       ORDER BY full_name LIMIT 20`
+    )
+    .all(`%${query}%`, `%${query}%`);
+}
+
+function findByPersonalNumber(personalNumber) {
+  return db.prepare('SELECT * FROM patients WHERE personal_number = ?').get(personalNumber);
 }
 
 function create({ fullName, personalNumber, dateOfBirth = null }) {
@@ -17,4 +25,4 @@ function create({ fullName, personalNumber, dateOfBirth = null }) {
   return findById(result.lastInsertRowid);
 }
 
-module.exports = { findById, search, create };
+module.exports = { findById, findByPersonalNumber, search, create };

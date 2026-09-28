@@ -1,7 +1,7 @@
 import { createGenesisBlock } from "./genesis.js";
 import { calculateBlockHash } from "./hash.js";
 import { serializeBlockPayload } from "./serialization.js";
-import { verifyBlockSignature } from "./signing.js";
+import { verifyBlockSignature, verifyBlockSignatureWith } from "./signing.js";
 
 function normalizeChain(chain, Block) {
   if (!Array.isArray(chain)) return null;
@@ -32,8 +32,8 @@ function validateChain(chain, Block, publicKey) {
         return false;
       }
       if (calculateBlockHash(block) !== block.hash) return false;
-      if (index === 0 || !publicKey) return true;
-      return verifyBlockSignature(block, publicKey);
+      if (index === 0) return true;
+      return verifyBlockSignatureWith(block, publicKey);
     });
   } catch {
     return false;

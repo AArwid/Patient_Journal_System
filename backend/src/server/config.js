@@ -13,7 +13,7 @@ module.exports = {
     (dbPath === ":memory:"
       ? undefined
       : path.resolve(path.dirname(dbPath), "audit-blockchain.json")),
-  clientOrigin: process.env.CLIENT_ORIGIN || "http://localhost:5173",
+  clientOrigin: process.env.CLIENT_ORIGIN || "http://localhost:3000",
   peerUrls: (process.env.PEER_URLS || "")
     .split(",")
     .map((url) => url.trim())

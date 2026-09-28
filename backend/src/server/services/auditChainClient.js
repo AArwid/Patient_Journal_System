@@ -64,21 +64,41 @@ function getBlockchain() {
   return blockchainPromise;
 }
 
+// Audit blocks are written fire-and-forget from the response 'finish' hook, so
+// writes are serialised here. That keeps concurrent appends from racing on the
+// chain tail, and lets readers wait for in-flight events instead of missing them.
+let pendingWrites = Promise.resolve();
+
 async function recordEvent(event) {
-  const blockchain = await getBlockchain();
-  const { privateKey } = await getSigningKeys();
-  const block = blockchain.createBlock({
-    event,
-    privateKey,
+  const write = pendingWrites.then(async () => {
+    const blockchain = await getBlockchain();
+    const { privateKey } = await getSigningKeys();
+    const block = blockchain.createBlock({
+      event,
+      privateKey,
+    });
+    return blockchain.appendBlock(block).toJSON();
   });
-  return blockchain.appendBlock(block).toJSON();
+  pendingWrites = write.catch(() => {});
+  return write;
 }
 
 async function getChainForPatient(patientId) {
+  await pendingWrites;
   const blockchain = await getBlockchain();
   return blockchain
     .getChain()
     .filter((block) => block.event.patientId === Number(patientId));
+}
+
+// Everyone may see their own access events, including the denied ones, without
+// being able to read anyone else's trail.
+async function getChainForActor(actorId) {
+  await pendingWrites;
+  const blockchain = await getBlockchain();
+  return blockchain
+    .getChain()
+    .filter((block) => block.event.actorId === Number(actorId));
 }
 
 async function verifyChain() {
@@ -92,6 +112,7 @@ async function verifyChain() {
 module.exports = {
   recordEvent,
   getChainForPatient,
+  getChainForActor,
   verifyChain,
   getBlockchain,
   getSigningKeys,
