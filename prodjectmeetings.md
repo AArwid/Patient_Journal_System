@@ -36,6 +36,13 @@ Deltagare på mötet /Arwid /Ellinor /Fredrik
 
 ## 2026-09-25 // Arwid
 
-Idag så hanterade vi pullrequests och mergade samtliga till main, diskuterade att Ahmed inte har närvarat eller medverkat på något än så länge så vi bestämmde att Arwid ska göra hans del p2p nätverk och middleware, Bestämmde ett ytterliggare standuppmöte på måndag den 09/28 för att säkerställa att vi ligger bra till och börja kika på sista delen inför presentationen och fixa buggar och kolla så allt fungerar som det ska.
+Idag så hanterade vi pullrequests och mergade samtliga till main, diskuterade att Ahmed inte har närvarat eller medverkat på något än så länge så vi bestämmde att Arwid ska göra hans del p2p nätverk och middleware, Bestämmde ett ytterliggare standuppmöte på måndag den 09/29 för att säkerställa att vi ligger bra till och börja kika på sista delen inför presentationen och fixa buggar och kolla så allt fungerar som det ska.
 
 Deltagare på mötet Arwid, Fredrik
+
+## 2026-09-29 // Ellinor
+
+Uppdatering om förra veckan, Arwid löte ihop koppling av allas delar. 
+Planering för redovisning: Uppdelning Arwid sköter domo och visar upp och Ellinor och Fredrik tar upp 4 stycken utmaningar under projekts gång. Vi kollade så vi inte hade några kodkonfilkter och mergea det sista. Vidare diskuterade även våra utmaningar och vi tog upp att master bransh hade ställts in av sig själv som default.
+
+Deltagare på mötet Arwid, Fredrik ochh Ellinor
