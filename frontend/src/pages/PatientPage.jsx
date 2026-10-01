@@ -96,6 +96,29 @@ export const PatientPage = () => {
     loadRecord(selectedPatientId);
   }, [user, navigate, selectedPatientId, loadRecord]);
 
+  // Live updates: a note created here or synced in from the other P2P server
+  // shows up for an open, authorized tab without a manual refresh. The
+  // backend already applies the same visibility rule before sending it, so
+  // anything that arrives here is safe to show - just skip a note we already
+  // have (our own just-saved note also comes back through this same stream).
+  useEffect(() => {
+    if (!patient) return;
+
+    const source = api.streamNotes(patient.id, (incomingNote) => {
+      setNotes((current) =>
+        current.some((existing) => existing.id === incomingNote.id)
+          ? current
+          : [incomingNote, ...current],
+      );
+    });
+
+    return () => source.close();
+    // Re-subscribe only when the selected patient actually changes, not on
+    // every refetch of the same record (which replaces `patient` with a new
+    // object but shouldn't reopen the connection).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [patient?.id]);
+
   if (!user) return null;
 
   const loading =

@@ -54,4 +54,20 @@ export const api = {
     }),
   getAccessLogs: (id) => request(`/patients/${id}/access-logs`),
   getMyAuditEvents: () => request("/audit/my-events"),
+  // Opens a live connection for new notes on this patient (incl. ones synced
+  // in from the other server over P2P). Call the returned EventSource's
+  // .close() when the viewer navigates away or picks a different patient.
+  streamNotes: (id, onNote) => {
+    const source = new EventSource(`${BASE_URL}/patients/${id}/notes/stream`, {
+      withCredentials: true,
+    });
+    source.onmessage = (event) => {
+      try {
+        onNote(JSON.parse(event.data));
+      } catch {
+        // Ignore malformed/heartbeat frames.
+      }
+    };
+    return source;
+  },
 };
