@@ -22,7 +22,23 @@ efterlikna GDPR-kravet på att en patient ska kunna se exakt vem som har
 
 ## Skärmdumpar
 
-_Läggs till innan redovisning._
+**Inloggning** - fem roller att välja mellan, inloggning sker mot det riktiga API:et (inte hårdkodat i webbläsaren):
+
+![Login](docs/screenshots/login.png)
+
+**Läkarvy** - journal med anteckningar och den live access-loggen till höger:
+
+![Läkarvy](docs/screenshots/doctor-view.png)
+
+**Samma journal senare** - fler anteckningar tillkomna, och notera den röda raden längst ner i loggen: ett nekat sökförsök från rollen "unauthorized" syns i access-trailen, precis som uppgiften kräver:
+
+![Läkarvy med nekat försök synligt i loggen](docs/screenshots/doctor-view-with-denied-attempt.png)
+
+**Sjuksköterskevy** - samma patient, men en annan uppsättning synliga anteckningar och en egen access-logg eftersom rollen skiljer sig från läkarens:
+
+![Sjuksköterskevy](docs/screenshots/nurse-view.png)
+
+_Kvar att lägga till: patientens egen vy, "Åtkomst nekad"-sidan för rollen unauthorized, samt en bild som visar live-uppdateringen mellan de två P2P-servrarna._
 
 ## Så kommer du igång
 
