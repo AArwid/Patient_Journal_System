@@ -25,11 +25,22 @@ async function createP2PRuntime({
     auditChainClient.getBlockchain(),
     auditChainClient.getSigningKeys(),
   ]);
+  // A peer's public key file only exists once that peer has started at
+  // least once and the key was exchanged - don't let a missing file crash
+  // this server, just run without trusting that peer until it's there.
   const trustedPublicKeys = Object.fromEntries(
-    Object.entries(peerPublicKeys).map(([peerId, publicKeyPath]) => [
-      peerId,
-      createPublicKey(readFileSync(publicKeyPath)),
-    ]),
+    Object.entries(peerPublicKeys)
+      .map(([peerId, publicKeyPath]) => {
+        try {
+          return [peerId, createPublicKey(readFileSync(publicKeyPath))];
+        } catch (error) {
+          console.warn(
+            `[${nodeId}] could not load public key for peer "${peerId}" from ${publicKeyPath} (${error.code || error.message}); that peer will be untrusted until the key exists and the server restarts.`,
+          );
+          return null;
+        }
+      })
+      .filter(Boolean),
   );
   const node = new PeerNode({
     blockchain,

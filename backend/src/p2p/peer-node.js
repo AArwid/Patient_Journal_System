@@ -48,6 +48,12 @@ class PeerNode extends EventEmitter {
   #maxMessageBytes;
   #privateKey;
   #peers = new Map();
+  // A node has two links to the same peer (the one it dialed out, and the
+  // one that peer dialed in with), so "don't send back to the sender's
+  // peerId" alone doesn't stop a note bouncing forever between the two
+  // links. Dedup by note id closes that loop regardless of topology.
+  #seenNoteIds = new Set();
+  #maxSeenNoteIds = 500;
 
   constructor({
     blockchain,
@@ -255,6 +261,16 @@ class PeerNode extends EventEmitter {
         `Peer sent a note that must not replicate: ${payload.note.visibility}`,
       );
     }
+
+    const noteId = payload.note.id;
+    if (noteId != null) {
+      if (this.#seenNoteIds.has(noteId)) return;
+      this.#seenNoteIds.add(noteId);
+      if (this.#seenNoteIds.size > this.#maxSeenNoteIds) {
+        this.#seenNoteIds.delete(this.#seenNoteIds.values().next().value);
+      }
+    }
+
     this.emit("note:received", { peerId: peer.peerId, note: payload.note });
     this.broadcastNote(payload.note, peer.peerId);
   }

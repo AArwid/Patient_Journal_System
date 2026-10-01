@@ -58,10 +58,15 @@ function onAccessEvent(handler) {
   bus.on("access-event", handler);
 }
 
+// Returns an unsubscribe function - callers with a lifetime shorter than the
+// process (an SSE connection, say) must call it when done or the listener
+// leaks for as long as the server runs.
 function onNote(handler, viewer) {
-  bus.on("note", (note) => {
+  const wrapped = (note) => {
     if (isNoteVisible(note, viewer)) handler(note);
-  });
+  };
+  bus.on("note", wrapped);
+  return () => bus.off("note", wrapped);
 }
 
 module.exports = {

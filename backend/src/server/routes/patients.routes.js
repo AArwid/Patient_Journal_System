@@ -59,6 +59,35 @@ router.get(
   },
 );
 
+// Server-Sent Events stream: pushes a note to an open browser tab the moment
+// it's created - on this server directly, or synced in from the other server
+// over the P2P layer - without the client having to poll or refresh. Same
+// access check as the other patient routes; broadcastClient.onNote applies
+// the same visibility rule as findVisibleForPatient on top of that.
+router.get("/:id/notes/stream", requirePatientAccess, (req, res) => {
+  const patientId = Number(req.params.id);
+
+  res.set({
+    "Content-Type": "text/event-stream",
+    "Cache-Control": "no-cache",
+    Connection: "keep-alive",
+  });
+  res.flushHeaders();
+
+  const unsubscribe = broadcastClient.onNote((note) => {
+    if (note.patient_id !== patientId) return;
+    res.write(`data: ${JSON.stringify(note)}\n\n`);
+  }, req.session.user);
+
+  // Keeps intermediary proxies/browsers from timing out an idle connection.
+  const heartbeat = setInterval(() => res.write(":\n\n"), 25_000);
+
+  req.on("close", () => {
+    clearInterval(heartbeat);
+    unsubscribe();
+  });
+});
+
 router.post(
   "/:id/notes",
   auditLogger("create_note"),
